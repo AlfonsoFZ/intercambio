@@ -1,0 +1,28 @@
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_certificate /etc/nginx/ssl/alfofern.crt;
+	ssl_certificate_key /etc/nginx/ssl/alfofern.key;
+
+	root /var/www/wordpress;
+	server_name alfofern.42.fr;
+	index index.php;
+
+	location / {
+		index	index.php;
+		add_header Last-Modified $date_gmt;
+		add_header Cache-Control 'no-store, no-cache';
+		if_modified_since off;
+		expires off;
+		etag off;
+	}
+
+	location 	~\.php$ { 
+		fastcgi_index index.php;
+		fastcgi_pass wordpress:9000;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PATH_INFO $fastcgi_path_info;       
+	}
+}
